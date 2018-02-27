@@ -1,3 +1,10 @@
+{-
+author: jackson c. wiebe
+date:   26 Feb 2018
+last:   ''
+-}
+
+
 module Types (Width, Height, Rectangle(..), Location, Token, row, col, locations)
 where
 

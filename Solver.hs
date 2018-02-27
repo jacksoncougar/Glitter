@@ -1,3 +1,9 @@
+{-
+author: jackson c. wiebe
+date:   26 Feb 2018
+last:   ''
+-}
+
 import Debug.Trace
 import Data.List
 import Data.Maybe
