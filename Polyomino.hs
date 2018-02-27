@@ -9,6 +9,8 @@ module Polyomino
   , createPolyomino
   , flipxy
   , flipv
+  , move
+  , orientations
   ) where
 
 import Types
@@ -41,7 +43,28 @@ flipv p@(Polyomino{ parts=ps, width=w }) =
 
   where flipv' :: Location -> Width -> Location
         flipv' (x,y) w = ((w - 1 - x),y)
-                  
+
+orientations :: Polyomino -> [Polyomino]
+orientations p =
+  let p' = flipv p;
+      a  = rotate p;
+      b  = rotate a;
+      c  = rotate b;
+      a' = flipv a;
+      b' = flipv b;
+      c' = flipv c in
+    nub [p,a,b,c,p',a',b',c']
+  where
+    rotate = flipv . flipxy
+
+-- Translate the polyomino to given location
+move :: Polyomino -> Location -> Polyomino
+move p@(Polyomino{ parts=xs }) loc =
+  p { parts = map (add loc) xs }
+  where
+    add :: Location -> Location -> Location
+    add (a,b) (c,d) = (a + c, b + d)
+                         
 instance Show Polyomino where
   show (Polyomino{parts=ps, token=t, width=w, height=h}) =
 

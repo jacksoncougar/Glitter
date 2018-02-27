@@ -5,7 +5,16 @@ last:   ''
 -}
 
 
-module Types (Width, Height, Rectangle(..), Location, Token, row, col, locations)
+module Types
+  ( Width
+  , Height
+  , Rectangle(..)
+  , Location
+  , Token
+  , Bounds
+  , row
+  , col
+  , locations)
 where
 
 type Width = Int
@@ -17,6 +26,8 @@ data Rectangle = Rectangle Int Int Width Height
 type Location = (Int, Int)
 
 type Token = Char
+
+type Bounds = (Width, Height)
 
 row :: Location -> Int
 row x = fst x
