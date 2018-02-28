@@ -10,6 +10,7 @@ module Solver
   ( Problem(..)
   , Solution(..)
   , solve
+  , solve'''
   ) where
 
 
@@ -48,3 +49,39 @@ solve Problem{board=b, polys=polys@(p:_)} =
 
     solve' board _ [] = Just $ Solution board
     solve' b [] _ = Nothing
+
+-- # SUB-SOLVER # -- 
+solve'' :: Board -> Bounds
+            -> [Polyomino] -- placements of current polyomino
+            -> [Polyomino] -- remaining pieces to place
+            -> [Polyomino] -- failed pieces
+            -> Maybe Board
+
+solve''' :: Problem -> Maybe Board
+solve''' (Problem b (p:ps)) =
+  let result = solve'' b (1,1) (places b p) ps [] in
+  case result of
+    Nothing -> Nothing
+    _ -> result
+
+solve'' b bs (p:ps) (r:rs) fs = do
+  let b' = place b p
+  let solution = solve'' b' bs (places b' r) rs fs 
+  case solution of
+    Nothing -> solve'' b bs ps (r:rs) fs
+    _ -> solution
+      
+  -- can't place current piece filled
+solve'' b bounds [] (r:q:rs) fs
+  | filled b bounds = Just b
+  | otherwise =
+      solve'' b bounds (places b q) rs (r:fs)
+
+solve'' b bounds [] (r:rs) fs
+  | filled b bounds = Just b
+  | otherwise = Nothing
+                      
+    
+    -- all placements tried and all pieces tried
+solve'' _ _ [] [] _ = Nothing 
+            
