@@ -11,7 +11,7 @@ module Types
   , Rectangle(..)
   , Location
   , Token
-  , Bounds
+  , Bounds(..)
   , row
   , col
   , locations)

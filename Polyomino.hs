@@ -5,7 +5,7 @@ last:   ''
 -}
 
 module Polyomino
-  ( Polyomino (Polyomino, token, parts, width)
+  ( Polyomino (Polyomino, token, parts, width, Empty)
   , createPolyomino
   , flipxy
   , flipv
@@ -15,12 +15,12 @@ module Polyomino
 
 import Types
 import Data.List
-data Polyomino = Polyomino { parts::[Location]
+data Polyomino = Empty | Polyomino { parts::[Location]
                            , width::Int
                            , height::Int
                            , token::Token
                            }
-                 deriving Eq
+                 deriving (Eq, Ord)
 
 createPolyomino :: [Location] -> Token -> Polyomino
 createPolyomino xs token =
@@ -68,7 +68,7 @@ move p@(Polyomino{ parts=xs }) loc =
 instance Show Polyomino where
   show (Polyomino{parts=ps, token=t, width=w, height=h}) =
 
-    intercalate "\n" . splitEvery w $ setTokens [] t (sort ps) w
+    '\n' : (intercalate "\n" . splitEvery w $ setTokens [] t (sort ps) w)
 
     where
       setTokens :: [Token] -> Token -> [Location] -> Int -> [Token]
