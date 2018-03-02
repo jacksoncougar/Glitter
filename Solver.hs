@@ -55,8 +55,11 @@ solve Problem{board=b, polys=polys@(p:_)} =
 
 
 debug b bs x ps rs ts = (trace $
-                     "\nbounds: " ++ show bs ++ 
-                    "\nboard: " ++ show b)
+                     "\nbounds: " ++ show bs ++
+                     "\nboard: " ++ show b){--
+                     "\nplaces: " ++ show ps ++
+                     "\npieces: " ++ show rs ++
+                     "\ntried: " ++ show ts)--}
 
                    
 -- # SUB-SOLVER # -- 
@@ -68,15 +71,15 @@ solve'' :: Board -> Bounds
 
 solve''' :: Problem -> Maybe Board
 solve''' (Problem b (p:ps)) =
-  let bs = (0,0);
+  let bs = (0,0,0,0);
       result = solve'' b bs (places'' b bs p) (p:ps) [] in
   case result of
     Nothing -> Nothing
     _ -> result
 
-eq (w,h) (w',h') = w==w' && h==h'
+eq ((_,_,w,h)) ((_,_,w',h')) = w==w' && h==h'
 
-solve'' b bs ps rs ts | (debug b bs ' ' ps rs ts) False = Nothing
+solve'' b bs ps rs ts | (debug b bs ' ' ps rs ts) False = Just b
 
 solve'' b bs ps (r:rs) ts
    -- subcess case:
@@ -143,18 +146,21 @@ solve'' b _ [] [] _ | filled b (bounds b) = Just b
                     | otherwise = Nothing 
      --}       
 grow :: Board -> Bounds -> Bounds
-grow b@Board{bounds=bs@(u,v)} bs'@(w,h)
-  | w >= u =
-    let h' = h + 1 in
-      (w, minimum [h', snd bs])
+grow b@Board{bounds=bs@(x,y,w,h)} bs'@(x',y',w',h')
+ =  let (x,y) = head $ sort $ locs b in
+  (x,y,1,1)
+{--
+  | w' >= w =
+    let height = h' + 1 in
+      (x', y', w, minimum [height, h])
   |otherwise =
-     let w' = w + 1 in
-       (minimum [w', fst bs], h){--
+     let width = w' + 1 in
+       (x', y', minimum [w, width], h){--
     let w' = w + 1;
       h' = h + 1;
       bs'' = (minimum [w', fst bs], minimum [h', snd bs]) in
     (trace $ "bounds: " ++ show bs'' ++ "\nboard: " ++ (show b))bs''
---}
+--}--}
 
 places'' :: Board -> Bounds -> Polyomino -> [Polyomino]
 places'' b bs p =
@@ -165,9 +171,9 @@ places'' b bs p =
     peel (o:os) (x:xs) = map (move o) x ++ peel os xs
     peel [] _ = []
     places' :: Board -> Bounds -> Polyomino -> [Polyomino]
-    places' board bs@(w,h) poly = do
+    places' board bs poly = do
       let xs = locs board
       let xs' = locations bs
-      let ps = filter (fits board) $ map (move poly) xs
+      let ps = filter (fits board) $ concat $ map (move' poly) xs
       sort $ nub $ filter (or . map (flip elem xs') . parts) $ ps
   

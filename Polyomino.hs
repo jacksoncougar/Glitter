@@ -10,11 +10,13 @@ module Polyomino
   , flipxy
   , flipv
   , move
+  , move'
   , orientations
   ) where
 
 import Types
 import Data.List
+import Debug.Trace
 data Polyomino = Empty | Polyomino { parts::[Location]
                            , width::Int
                            , height::Int
@@ -64,7 +66,21 @@ move p@(Polyomino{ parts=xs }) loc =
   where
     add :: Location -> Location -> Location
     add (a,b) (c,d) = (a + c, b + d)
-                         
+
+move' :: Polyomino -> Location -> [Polyomino]
+move' p@(Polyomino{ parts=xs, token=t }) loc = do
+  let parts = map (add loc) xs
+  let pivots = map (sub parts) parts
+  map (flip createPolyomino t) pivots
+  where
+    add :: Location -> Location -> Location
+    add (a,b) (c,d) = (a + c, b + d)
+    sub :: [Location] -> Location -> [Location]
+    sub xs' o = map (sub' o) xs
+    sub' :: Location -> Location -> Location
+    sub' (a,b) (c,d) = (a-c, b-d)
+
+                      
 instance Show Polyomino where
   show (Polyomino{parts=ps, token=t, width=w, height=h}) =
 

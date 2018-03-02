@@ -27,7 +27,7 @@ type Location = (Int, Int)
 
 type Token = Char
 
-type Bounds = (Width, Height)
+type Bounds = (Int, Int, Width, Height)
 
 row :: Location -> Int
 row x = fst x
@@ -36,5 +36,5 @@ col :: Location -> Int
 col x = snd x
 
 locations :: Bounds -> [Location]
-locations (width,height)
-  = [(i, j) | j <- [0..(height-1)], i <- [0..(width-1)]]
+locations (x,y,width,height)
+  = [(x+i, y+j) | j <- [0..(height-1)], i <- [0..(width-1)]]

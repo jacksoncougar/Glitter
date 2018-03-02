@@ -28,7 +28,7 @@ instance Show Board where
       show' _ _ _ = ""
 
 makeBoard :: Int -> Int -> Board
-makeBoard x y  = Board (x, y) [
+makeBoard x y  = Board (0,0, x, y) [
   (i,j) | j <- [0..(y-1)],
           i <- [0..(x-1)]
                        ] (replicate (x*y) '.' )
@@ -62,7 +62,7 @@ place b@(Board{ locs=xs }) (Polyomino{parts=ps, token=token}) =
     indexOf (row, col) width = row + col * width
 
     widthOf :: Bounds -> Int
-    widthOf b = fst b
+    widthOf (_,_,w,_) = w
                                
 places :: Board -> Polyomino -> [Polyomino]
 places b p =
