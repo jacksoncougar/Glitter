@@ -1,26 +1,27 @@
 {-
-author: jackson c. wiebe
-date:   26 Feb 2018
-last:   ''
+author: Jackson C. Wiebe
+date:   March 1 2018
 -}
 
 module Polyomino
-  ( Polyomino (Polyomino, token, parts, width)
+  ( Polyomino (Polyomino, token, parts, width, Empty)
   , createPolyomino
   , flipxy
   , flipv
   , move
+  , move'
   , orientations
   ) where
 
 import Types
 import Data.List
-data Polyomino = Polyomino { parts::[Location]
+import Debug.Trace
+data Polyomino = Empty | Polyomino { parts::[Location]
                            , width::Int
                            , height::Int
                            , token::Token
                            }
-                 deriving Eq
+                 deriving (Eq, Ord)
 
 createPolyomino :: [Location] -> Token -> Polyomino
 createPolyomino xs token =
@@ -64,19 +65,36 @@ move p@(Polyomino{ parts=xs }) loc =
   where
     add :: Location -> Location -> Location
     add (a,b) (c,d) = (a + c, b + d)
-                         
+
+move' :: Polyomino -> Location -> [Polyomino]
+move' p@(Polyomino{ parts=xs, token=t }) loc = do
+  let parts = map (add loc) xs
+  let pivots = map (sub parts) parts
+  map (flip createPolyomino t) pivots
+  where
+    add :: Location -> Location -> Location
+    add (a,b) (c,d) = (a + c, b + d)
+    sub :: [Location] -> Location -> [Location]
+    sub xs' o = map (sub' o) xs
+    sub' :: Location -> Location -> Location
+    sub' (a,b) (c,d) = (a-c, b-d)
+
+                      
 instance Show Polyomino where
   show (Polyomino{parts=ps, token=t, width=w, height=h}) =
 
-    intercalate "\n" . splitEvery w $ setTokens [] t (sort ps) w
+    let m = ["\n"] in
+    concat $
+    "\n" : (intercalate m $ splitEvery w $ setTokens [] t (sort ps) w)
 
     where
       setTokens :: [Token] -> Token -> [Location] -> Int -> [Token]
       setTokens vs a ((x,y):xs) w = do
-        let vs' = setAt (x + y * w) a ' ' vs
+        let vs' = setAt (x + y * w) a " " vs
         setTokens vs' a xs w
       setTokens vs _ [] _ = vs
 
+      splitEvery :: Int -> [Token] -> [[Token]]
       splitEvery _ [] = []
       splitEvery n list =
         let (first,rest) = splitAt n list in

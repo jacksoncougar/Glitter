@@ -1,0 +1,22 @@
+3 3
+2
+5  0 0  0 1  0 2  1 0  1 1
+4  0 0  1 0  1 1  2 0 
+
+The space looks like:
+
+. . .
+. . .
+. . .
+
+The polyominos look like:
+
+x x
+x x x
+
+and:
+
+  y
+y y y
+
+No matter how they are placed, they both fill the center cell. Thus, they can't fit.
