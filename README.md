@@ -14,7 +14,24 @@ A solution is still valid if there are unfilled places on the board.
 
 ## Example
 
-This is an example program output from a 3x20 pentomino problem.
+This following is an exmaple of a 20x3 pentomino problem.
+
+	20 3
+	12
+	5  0 0  0 1  0 2  1 0  1 1
+	5  0 0  1 0  1 1  2 0  3 0
+	5  0 0  1 0  2 0  3 0  4 0
+	5  0 0  1 0  2 0  1 1  1 2
+	5  0 0  0 1  0 2  1 0  1 2
+	5  0 0  0 1  0 2  1 0  2 0
+	5  0 0  1 0  1 1  1 2  2 2
+	5  0 1  1 0  1 1  1 2  2 1
+	5  0 0  0 1  0 2  0 3  1 0
+	5  0 0  1 0  1 1  2 1  2 2
+	5  0 0  1 0  2 0  2 1  3 1
+	5  0 1  1 0  1 1  1 2  2 2
+
+Example program output from the 20x3 pentomino problem:
 
 	Found a solution!
 	Looks like this: 
@@ -25,11 +42,11 @@ This is an example program output from a 3x20 pentomino problem.
 
 The file can be entered manually using the following syntax:
 
-	[HEIGHT] [WIDTH] [ENTER] /* width and height of board*/
-	[NUMBER OF POLYOMINOS]  [ENTER] /* total number of polyominals to follow */
-	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] [ENTER] /* first polyomino */
-	...
-	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] [ENTER] /* last polyomino */
+	[WIDTH] [HEIGHT] ⏎
+	[NUMBER OF POLYOMINOS] ⏎
+	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] ⏎ # first polyomino
+	⋮
+	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] ⏎ # last polyomino
 After pressing the last enter the program should execute immediatly.
 
 Alternatively the problem can be passed inside a file using file redirection:
