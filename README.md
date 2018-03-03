@@ -28,3 +28,7 @@ Alternatively the problem can be passed inside a file using file redirection:
 
  -nc
 : disable ANSI colour output
+
+# BUILD
+
+	ghc Main
