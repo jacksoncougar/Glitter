@@ -1,7 +1,6 @@
 {-
-author: jackson c. wiebe
-date:   26 Feb 2018
-last:   ''
+author: Jackson C. Wiebe
+date:   March 1 2018
 -}
 
 module Polyomino
@@ -84,15 +83,18 @@ move' p@(Polyomino{ parts=xs, token=t }) loc = do
 instance Show Polyomino where
   show (Polyomino{parts=ps, token=t, width=w, height=h}) =
 
-    '\n' : (intercalate "\n" . splitEvery w $ setTokens [] t (sort ps) w)
+    let m = ["\n"] in
+    concat $
+    "\n" : (intercalate m $ splitEvery w $ setTokens [] t (sort ps) w)
 
     where
       setTokens :: [Token] -> Token -> [Location] -> Int -> [Token]
       setTokens vs a ((x,y):xs) w = do
-        let vs' = setAt (x + y * w) a ' ' vs
+        let vs' = setAt (x + y * w) a " " vs
         setTokens vs' a xs w
       setTokens vs _ [] _ = vs
 
+      splitEvery :: Int -> [Token] -> [[Token]]
       splitEvery _ [] = []
       splitEvery n list =
         let (first,rest) = splitAt n list in

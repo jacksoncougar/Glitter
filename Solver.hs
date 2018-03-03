@@ -1,18 +1,12 @@
 {-
-author: jackson c. wiebe
-date:   26 Feb 2018
+author: Jackson C. Wiebe
+date:   March 1 2018
 last:   ''
 -}
 
-
-
 module Solver
   ( Problem(..)
-  , Solution(..)
   , solve
-  , solve'''
-  , solve''
-  , places''
   ) where
 
 
@@ -22,158 +16,70 @@ import Data.Maybe
 import Polyomino
 import Types
 import Board
+import Terminal
 
 data Problem = Problem { board::Board, polys::[Polyomino] }
   deriving Show
 
-data Solution = Solution { solved_board::Board}
-  deriving Show
+solve :: Problem -> Maybe Board
 
-solve :: Problem -> Maybe Solution
-solve Problem{board=b, polys=polys@(p:_)} =
-  let bounds = (1,1) in
-    solve' b  (places b  p) polys 
-  where
-    solve' :: Board -> [Polyomino] -> [Polyomino]-> Maybe Solution
-    solve' b (l:ls) (p:q:ps) = do
-      let board'   = (place b $ l);    
-          solution = solve' board' (places'' board' (bounds board') q) (q:ps)
-      case solution of 
-        Nothing -> solve' b ls (p:q:ps) -- solve for next location
-        _       -> solution             -- return solution 
+solve (Problem b@Board{bounds=(_,_,w,h)} ps) = do
+  let bs = (0,0,0,0)
+  let (sp:sps) = sort ps
+  solve' b bs (places b bs sp) (sp:sps) []
 
-    solve' b (l:ls) (p:ps) = 
-      let board' = (place b $ l);
-          solution = solve' board' [] ps in
-        case solution of 
-          Nothing -> solve' b ls (p:ps)   -- solve for next location
-          _       -> solution             -- return solution 
-
-    solve' board _ [] = Just $ Solution board
-    solve' b [] _ = Nothing
-
-
-
-debug b bs x ps rs ts = (trace $
-                     "\nbounds: " ++ show bs ++
-                     "\nboard: " ++ show b){--
-                     "\nplaces: " ++ show ps ++
-                     "\npieces: " ++ show rs ++
-                     "\ntried: " ++ show ts)--}
-
-                   
 -- # SUB-SOLVER # -- 
-solve'' :: Board -> Bounds
+solve' :: Board -> Bounds
         -> [Polyomino] -- placements of current polyomino
         -> [Polyomino] -- remaining pieces to place
         -> [Polyomino] -- failed pieces
         -> Maybe Board
 
-solve''' :: Problem -> Maybe Board
-solve''' (Problem b (p:ps)) =
-  let bs = (0,0,0,0);
-      result = solve'' b bs (places'' b bs p) (p:ps) [] in
-  case result of
-    Nothing -> Nothing
-    _ -> result
+-- dummy for showing intermediate steps
+solve' b _ _ _ _ | trace ( clear ++ "Searching: " ++ show b) False = Nothing
 
-eq ((_,_,w,h)) ((_,_,w',h')) = w==w' && h==h'
-
-solve'' b bs ps rs ts | (debug b bs ' ' ps rs ts) False = Just b
-
-solve'' b bs ps (r:rs) ts
+solve' b bs ps (r:rs) ts
    -- subcess case:
-  | (eq bs $ bounds b) == False && (filled b bs) = do
+  | (filled b bs) = do
       let bs' = grow b bs
-      let ps' = places'' b bs' r
-      --retry with larger bounds
-      solve'' b bs' ps' ((r:rs)++ts) []
+      let ps' = places b bs' r
+      --retry with new bounds
+      solve' b bs' ps' ((r:rs)++ts) []
 
 -- tried all places for current piece (more pieces remain)
-solve'' b bs [] (r:q:rs) fs = 
-  let ps' = places'' b bs q in
-    solve'' b bs ps' (q:rs) (r:fs) -- try with another polyomino
+solve' b bs [] (r:q:rs) fs = 
+  let ps' = places b bs q in
+    solve' b bs ps' (q:rs) (r:fs) -- try with another polyomino
 
--- reduction steps:
-solve'' b bs (p:ps) (r:q:rs) fs = do
+-- normal reduction:
+solve' b bs (p:ps) (r:q:rs) fs = do
   -- place the current piece
   let b' = place b p
-  let ps' = places'' b' bs q
-  let solution = solve'' b' bs ps' ((q:rs)++fs) [] -- try next piece
+  let ps' = places b' bs q
+  let solution = solve' b' bs ps' ((q:rs)++fs) [] -- try next piece
   case solution of
-    Nothing -> solve'' b bs ps (r:q:rs) fs -- try next placement
+    Nothing -> solve' b bs ps (r:q:rs) fs -- try next placement
     _ -> solution
 
-solve'' b bs (p:ps) (r:rs) (f:fs) = do
+-- reduction when on last untried piece:
+solve' b bs (p:ps) (r:rs) (f:fs) = do
   -- place the current piece
   let b' = place b p
-  let ps' = places'' b' bs f
-  let solution = solve'' b' bs ps' (f:fs) [] -- try next piece
-  case solution of
-    Nothing -> Nothing
-    _ -> solution
+  let ps' = places b' bs f
+  solve' b' bs ps' (f:fs) [] -- try next piece
 
-
-solve'' b bs (p:ps) (r:rs) [] = do
-  -- place the current piece
+-- solving last piece
+solve' b bs (p:ps) (r:rs) [] = do
+  -- place last piece...
   let b' = place b p
-  if filled b' $ bounds b'
-    then Just b'
-    else solve'' b bs ps (r:rs) []
+  Just b'
 
 -- tried all pieces and nothing fit
-solve'' _ _ [] _ _ = Nothing
+solve' _ _ [] _ _ = Nothing
 
-
-
-  {--
-  -- can't place current piece filled
-solve'' b bs@(w,h) [] (r:q:rs) fs
-  | filled b (bounds b) = Just b
-  | filled b bs
-  = solve'' b (grow b bs) (places'' b bs r) ((r:rs)++fs) []
-  | otherwise =
-      solve'' b bs (places'' b bs q) rs (r:fs)
-
-solve'' b bs@(w,h) [] (r:rs) fs
-  | filled b (bounds b) = Just b
-  | filled b bs
-  = solve'' b (w+1,h+1) (places'' b bs r) ((r:rs)++fs) []
-  | otherwise = Nothing
-
-    -- all placements tried and all pieces tried
-solve'' b _ [] [] _ | filled b (bounds b) = Just b
-                    | otherwise = Nothing 
-     --}       
+-- grows the search space of the board
 grow :: Board -> Bounds -> Bounds
-grow b@Board{bounds=bs@(x,y,w,h)} bs'@(x',y',w',h')
- =  let (x,y) = head $ sort $ locs b in
-  (x,y,1,1)
-{--
-  | w' >= w =
-    let height = h' + 1 in
-      (x', y', w, minimum [height, h])
-  |otherwise =
-     let width = w' + 1 in
-       (x', y', minimum [w, width], h){--
-    let w' = w + 1;
-      h' = h + 1;
-      bs'' = (minimum [w', fst bs], minimum [h', snd bs]) in
-    (trace $ "bounds: " ++ show bs'' ++ "\nboard: " ++ (show b))bs''
---}--}
+grow b _ =
+  let (x,y) = head $ sort $ locs b in
+    (x,y,1,1) -- just return the next open place...
 
-places'' :: Board -> Bounds -> Polyomino -> [Polyomino]
-places'' b bs p =
-  let os = orientations p;
-      xs = [ xs | xs <- concat $ map (places' b bs) os ] in
-    xs
-  where
-    peel (o:os) (x:xs) = map (move o) x ++ peel os xs
-    peel [] _ = []
-    places' :: Board -> Bounds -> Polyomino -> [Polyomino]
-    places' board bs poly = do
-      let xs = locs board
-      let xs' = locations bs
-      let ps = filter (fits board) $ concat $ map (move' poly) xs
-      sort $ nub $ filter (or . map (flip elem xs') . parts) $ ps
-  

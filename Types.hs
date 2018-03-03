@@ -1,14 +1,12 @@
 {-
-author: jackson c. wiebe
-date:   26 Feb 2018
-last:   ''
+author: Jackson C. Wiebe
+date:   March 1 2018
 -}
 
 
 module Types
   ( Width
   , Height
-  , Rectangle(..)
   , Location
   , Token
   , Bounds(..)
@@ -20,12 +18,9 @@ where
 type Width = Int
 type Height = Int
 
-data Rectangle = Rectangle Int Int Width Height
-  deriving Show
-
 type Location = (Int, Int)
 
-type Token = Char
+type Token = String
 
 type Bounds = (Int, Int, Width, Height)
 
