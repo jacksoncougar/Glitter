@@ -1,12 +1,20 @@
-# NAME
+# Glitter
+
+Haskell polyomino puzzle solver with terminal visualization.
+
+## Demo
+
+![demo](.\docs\images\glitter-demo.gif)
+
+## Name
 
 glitter - polyomino board solver
 
-# SYNOPSIS
+## Synopsis
 
 glitter [-nc] < file...
 
-# DESCRIPTION
+## Description
 
 Glitter places polyominos onto a board of locations and attempts to find a board solution with all polyominos placed. No polyominos can be placed overlapping with another, and no polyominos can extend outside of the board. 
 
@@ -44,20 +52,20 @@ The file can be entered manually using the following syntax:
 
 	[WIDTH] [HEIGHT] ⏎
 	[NUMBER OF POLYOMINOS] ⏎
-	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] ⏎ # first polyomino
+	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] ⏎ ## first polyomino
 	⋮
-	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] ⏎ # last polyomino
+	[NUMBER OF COORDINATES] [COORD 1] [COORD 2] ... [COORD N] ⏎ ## last polyomino
 After pressing the last enter the program should execute immediatly.
 
 Alternatively the problem can be passed inside a file using file redirection:
 
 	glitter < file
 
-# OPTIONS
+## Options
 
 	-nc     : disable ANSI colour output
 	-nl     : disable polyomino labels
 
-# BUILD
+## Build
 
 	ghc Main
