@@ -4,7 +4,7 @@ Haskell polyomino puzzle solver with terminal visualization.
 
 ## Demo
 
-![demo](.\docs\images\glitter-demo.gif)
+![demo](docs/images/glitter-demo.gif)
 
 ## Name
 
