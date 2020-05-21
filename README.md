@@ -1,6 +1,8 @@
 # Glitter
 
-Haskell polyomino puzzle solver with terminal visualization.
+Haskell polyomino puzzle solver with terminal visualization. 
+
+It works by constructing a smallest region on the board that it tried to solve completely. Only when it cannot cannot place more pieces or the region is fully solved does it increase the size of the region and continue. When the algorithm backtracks it also decreases the search region. In this way the algorithm never wastes time looking through placements that cannot have a valid solution (e.g. if there was a hole in the board that could not be filled by the remaining piece this approach will fail-fast).
 
 ## Demo
 
